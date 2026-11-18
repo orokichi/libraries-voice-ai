@@ -62,6 +62,7 @@ export default function App() {
   const abortRef = useRef<AbortController | null>(null);
   const autoStopRef = useRef<number | null>(null);
   const speakingTokenRef = useRef(0);
+  const listeningRef = useRef(false);
 
   const narrow = useMediaQuery('(max-width: 420px)');
   const small = useMediaQuery('(max-width: 640px)');
@@ -252,6 +253,7 @@ export default function App() {
   );
 
   const finishListening = useCallback(async () => {
+    listeningRef.current = false;
     if (autoStopRef.current !== null) {
       window.clearTimeout(autoStopRef.current);
       autoStopRef.current = null;
@@ -281,19 +283,21 @@ export default function App() {
   }, [apiKey, mic, recorder, send]);
 
   const beginListening = useCallback(async () => {
-    if (isBusyPhase(phaseRef.current) || phaseRef.current === 'listening') return;
+    if (listeningRef.current || isBusyPhase(phaseRef.current)) return;
     setError(null);
     speakingTokenRef.current += 1;
     speaker.cancel();
+    listeningRef.current = true;
     setPhase('listening');
 
     const stream = await mic.start();
     if (!stream) {
+      listeningRef.current = false;
       setPhase('idle');
       return;
     }
     // 許可待ちの間にユーザーが停止した場合、録音は始めずマイクだけ閉じる
-    if (phaseRef.current !== 'listening') {
+    if (!listeningRef.current) {
       mic.stop();
       return;
     }
@@ -305,7 +309,7 @@ export default function App() {
   }, [finishListening, mic, recorder, speaker]);
 
   const toggleMic = useCallback(() => {
-    if (phaseRef.current === 'listening') {
+    if (listeningRef.current) {
       void finishListening();
       return;
     }
