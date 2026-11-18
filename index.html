@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#08080a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta
+      name="description"
+      content="Groq の音声認識と LLM をつないだ、Libraries.dev デザインの日本語音声AIアシスタント。"
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>Libraries Voice — Groq 音声AIアシスタント</title>
+    <script>
+      // 初回描画のちらつきを防ぐため、React より先にテーマを決める
+      (function () {
+        try {
+          var stored = localStorage.getItem('libraries-voice-ai:theme');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark';
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.style.colorScheme = theme;
+        } catch (e) {
+          /* localStorage が使えなくてもテーマ未設定のまま動く */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
