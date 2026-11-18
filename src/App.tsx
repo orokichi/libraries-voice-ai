@@ -292,6 +292,11 @@ export default function App() {
       setPhase('idle');
       return;
     }
+    // 許可待ちの間にユーザーが停止した場合、録音は始めずマイクだけ閉じる
+    if (phaseRef.current !== 'listening') {
+      mic.stop();
+      return;
+    }
     recorder.start(stream);
     autoStopRef.current = window.setTimeout(() => {
       autoStopRef.current = null;
